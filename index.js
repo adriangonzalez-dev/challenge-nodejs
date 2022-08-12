@@ -3,45 +3,66 @@ const {getLetters, getPosition} =  require('./data/getInfo');
 const newPosition = Object.entries(getPosition);
 const newLetters = Object.entries(getLetters);
 
-let newArray = []
-
-const getUrl = () =>{
-    
-    newArray = newLetters.map(char=>{
-        const positionLetter = newPosition.find(position=>char[1]===position[0])
+//getUrl toma un array con caracteres y un array con posiciones,
+//evalua si el valor del primer array coincide con la clave del segundo array
+//retorna un nuevo array donde cada elemento contiene un objeto con un caracter y sus posiciones
+const getUrl = (arrayLetter, arrayPositions) =>{
+    let newArray = []
+    newArray = arrayLetter.map(char=>{
+        const positionLetter = arrayPositions.find(position=>char[1]===position[0])
     
                     return {
                         char: char[0],
                         position: positionLetter[1]
                     }
     })
+    return newArray
 };
 
-getUrl();
+//orderUrl toma un array donde la clave position contiene un array con las posiciones del caracter
+//retorna un nuevo array que permite individualizar los caracteres con una posición unica
+//y los ordena segun el valor de position
+const orderUrl = (array) =>{
+    
+    let tempLetter = []
 
-let count = 0 //Contador para saber la cantidad de caracteres
-
-for(let i = 0; i < newArray.length; i++){
-        count = count + newArray[i].position.length
-        //console.log(newArray[0].position[0])
-}
-
-//TOCAR A PARTIR DE ACA!
-
-console.log(count)
-
-let finalArray = newArray.map(objLetter=>{
-    for(let i = 0 ; i<=count.length; i++){
-        if(objLetter.position.includes(i)){
-            return {
+    array.forEach(objLetter=>{
+        objLetter.position.forEach(position => {
+            tempLetter.push({
                 char: objLetter.char,
-                position:objLetter.position
-            }
+                position
+            })
+        })
+    })
+    
+    return tempLetter.sort((a, b) => {
+        if (a.position > b.position) {
+          return 1;
         }
-    }
-})
+        if (a.position < b.position) {
+            return -1;
+        }
+        return 0;
+    });
+};
 
-console.log(finalArray)
-//console.log(newArray)
+//Toma un array de objetos, extrae el valor de la clave 'char'
+//retorna un nuevo array con solo caracteres ordenados y se pasa a string
+const link = (linkArray) =>{
+    const newLink = []
+    linkArray.forEach(letter=>{
+        let charArray = Object.values(letter.char).toString()
+        
+        newLink.push(charArray)
+    })
 
+    return newLink.join('')
+};
 
+const url = link(orderUrl(getUrl(newLetters, newPosition)));
+
+module.exports = {
+    getUrl,
+    orderUrl,
+    link
+}
